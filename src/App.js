@@ -1,23 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+import { useCallback } from 'react';
+import { db, auth, googleProvider } from './firebase';
+import { signInWithPopup } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function App() {
+  const [ user ] = useAuthState(auth);
+
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    auth.signOut();
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {user ? (
+        <>
+          <h1>Hello, {user?.displayName}</h1>
+          { JSON.stringify(user) }
+          <button onClick={handleLogout}>Log out</button>
+        </>
+      ) : (
+        <button onClick={signInWithGoogle}>Sign In with Google</button>
+      )}
     </div>
   );
 }
