@@ -1,21 +1,31 @@
-import { useCallback } from 'react';
-import { db, auth, googleProvider } from './firebase';
-import { signInWithPopup } from 'firebase/auth';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useState, useEffect } from "react";
+import { useAppContext } from "./context/AppContext";
+import { db } from './firebase';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 
 function App() {
-  const [ user ] = useAuthState(auth);
+  const { user, onSignInWithGoogle, onHandleLogout, } = useAppContext();
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState('');
 
-  const signInWithGoogle = useCallback(async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
-    }
-  });
+  useEffect(() => {
+    const q = query(collection(db, 'todos'), orderBy('timestamp', 'desc'))
+    onSnapshot(q, (snapshot) => {
+      setTodos(snapshot.docs.map(doc => {
+        // console.log(doc)
+        let data = doc.data();
+        return { ...data, id: doc.id }
+      }))
+    })
+  }, []);
 
-  const handleLogout = () => {
-    auth.signOut();
+  const addTodo = (e) => {
+    e.preventDefault();
+    addDoc(collection(db, "todos"), {
+      todo: input,
+      timestamp: serverTimestamp(),
+    });
+    setInput("");
   };
 
   return (
@@ -23,12 +33,23 @@ function App() {
       {user ? (
         <>
           <h1>Hello, {user?.displayName}</h1>
-          { JSON.stringify(user) }
-          <button onClick={handleLogout}>Log out</button>
+          <button onClick={onHandleLogout}>Log out</button>
         </>
       ) : (
-        <button onClick={signInWithGoogle}>Sign In with Google</button>
+        <button onClick={onSignInWithGoogle}>Sign In with Google</button>
       )}
+
+      <div className="todos">
+        <h2> TODO List App</h2>
+        <form>
+            <input type="text" value={input} onChange={e => setInput(e.target.value)} />
+            <button onClick={addTodo}>Add Todo</button>
+        </form>
+        { JSON.stringify(todos) }
+        <ul>
+          { todos.map(item => <li key={ item.id }>{ item.todo }</li>) }
+        </ul>
+      </div>
     </div>
   );
 }
