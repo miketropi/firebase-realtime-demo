@@ -1,0 +1,31 @@
+.site-nav {
+
+  a {
+    text-decoration: none;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1.5em;
+
+    li {
+      list-style: none;
+
+      a {
+        color: black;
+        transition: .3s ease;
+        -webkit-transition: .3s ease;
+        font-size: .9em;
+
+        &.active {
+          background: black;
+          color: white;
+          padding: .6em .8em;
+          border-radius: $border-radius-global;
+        }
+      }
+    }
+  }
+}

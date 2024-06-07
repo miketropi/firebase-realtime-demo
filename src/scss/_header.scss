@@ -1,0 +1,15 @@
+#MAIN_HEADER {
+  padding: 1em 0;
+  background: #FFF;
+  margin-bottom: 3em;
+}
+
+.header-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  
+  .user-auth {
+    margin-left: auto;
+  }
+}
