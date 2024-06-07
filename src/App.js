@@ -6,13 +6,13 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 function App() {
   const [ user ] = useAuthState(auth);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Error signing in with Google:", error);
     }
-  };
+  });
 
   const handleLogout = () => {
     auth.signOut();
